@@ -11,17 +11,17 @@ include 'menu.php';
             <div class="col-mb-12">
                 <div id="typecho-welcome" class="message">
                     <form action="<?php $options->adminUrl(); ?>" method="get">
-                    <h3><?php _e('欢迎您使用 "%s" 管理后台: ', $options->title); ?></h3>
+                    <h3><?php _e('Chào mừng bạn đến với trang quản trị "%s": ', $options->title); ?></h3>
                     <ol>
-                        <li><a class="operate-delete" href="<?php $options->adminUrl('profile.php#change-password'); ?>"><?php _e('强烈建议更改你的默认密码'); ?></a></li>
+                        <li><a class="operate-delete" href="<?php $options->adminUrl('profile.php#change-password'); ?>"><?php _e('Rất khuyến khích bạn thay đổi mật khẩu mặc định của bạn'); ?></a></li>
                         <?php if($user->pass('contributor', true)): ?>
-                        <li><a href="<?php $options->adminUrl('write-post.php'); ?>"><?php _e('撰写第一篇日志'); ?></a></li>
-                        <li><a href="<?php $options->siteUrl(); ?>"><?php _e('查看我的站点'); ?></a></li>
+                        <li><a href="<?php $options->adminUrl('write-post.php'); ?>"><?php _e('Viết bài đăng đầu tiên'); ?></a></li>
+                        <li><a href="<?php $options->siteUrl(); ?>"><?php $user->pass('administrator', true) ? _e('Xem trang web của tôi') : _e('Xem trang web'); ?></a></li>
                         <?php else: ?>
-                        <li><a href="<?php $options->siteUrl(); ?>"><?php _e('查看我的站点'); ?></a></li>
+                        <li><a href="<?php $options->siteUrl(); ?>"><?php _e('Xem trang web'); ?></a></li>
                         <?php endif; ?>
                     </ol>
-                    <p><button type="submit" class="btn primary"><?php _e('让我直接开始使用吧 &raquo;'); ?></button></p>
+                    <p><button type="submit" class="btn primary"><?php _e('Hãy cho tôi bắt đầu ngay &raquo;'); ?></button></p>
                     </form>
                 </div>
             </div>

@@ -1,8 +1,8 @@
 <?php if(!defined('__TYPECHO_ADMIN__')) exit; ?>
 <?php
-if (isset($post) && $post instanceof Typecho_Widget && $post->have()) {
+if (isset($post) && $post instanceof \Typecho\Widget && $post->have()) {
     $fileParentContent = $post;
-} else if (isset($page) && $page instanceof Typecho_Widget && $page->have()) {
+} elseif (isset($page) && $page instanceof \Typecho\Widget && $page->have()) {
     $fileParentContent = $page;
 }
 
@@ -13,8 +13,8 @@ if (preg_match("/^([0-9]+)([a-z]{1,2})$/i", $phpMaxFilesize, $matches)) {
 }
 ?>
 
-<script src="<?php $options->adminStaticUrl('js', 'moxie.js?v=' . $suffixVersion); ?>"></script>
-<script src="<?php $options->adminStaticUrl('js', 'plupload.js?v=' . $suffixVersion); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'moxie.js'); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'plupload.js'); ?>"></script>
 <script>
 $(document).ready(function() {
     function updateAttacmentNumber () {
@@ -67,22 +67,22 @@ $(document).ready(function() {
         var file = error.file, code = error.code, word; 
         
         switch (code) {
-            case plupload.FILE_SIZE_ERROR:
-                word = '<?php _e('文件大小超过限制'); ?>';
-                break;
-            case plupload.FILE_EXTENSION_ERROR:
-                word = '<?php _e('文件扩展名不被支持'); ?>';
-                break;
-            case plupload.FILE_DUPLICATE_ERROR:
-                word = '<?php _e('文件已经上传过'); ?>';
-                break;
-            case plupload.HTTP_ERROR:
-            default:
-                word = '<?php _e('上传出现错误'); ?>';
-                break;
-        }
+    case plupload.FILE_SIZE_ERROR:
+        word = '<?php _e('Kích thước tập tin vượt quá giới hạn'); ?>';
+        break;
+    case plupload.FILE_EXTENSION_ERROR:
+        word = '<?php _e('Phần mở rộng của tập tin không được hỗ trợ'); ?>';
+        break;
+    case plupload.FILE_DUPLICATE_ERROR:
+        word = '<?php _e('Tập tin đã được tải lên trước đó'); ?>';
+        break;
+    case plupload.HTTP_ERROR:
+    default:
+        word = '<?php _e('Đã xảy ra lỗi khi tải lên'); ?>';
+        break;
+}
 
-        var fileError = '<?php _e('%s 上传失败'); ?>'.replace('%s', file.name),
+var fileError = '<?php _e('%s tải lên không thành công'); ?>'.replace('%s', file.name),
             li, exist = $('#' + file.id);
 
         if (exist.length > 0) {
@@ -105,10 +105,10 @@ $(document).ready(function() {
             .data('url', data.url)
             .data('image', data.isImage)
             .html('<input type="hidden" name="attachment[]" value="' + data.cid + '" />'
-                + '<a class="insert" target="_blank" href="###" title="<?php _e('点击插入文件'); ?>">' + data.title + '</a><div class="info">' + data.bytes
+                + '<a class="insert" target="_blank" href="###" title="<?php _e('Nhấp để chèn tập tin'); ?>">' + data.title + '</a><div class="info">' + data.bytes
                 + ' <a class="file" target="_blank" href="<?php $options->adminUrl('media.php'); ?>?cid=' 
-                + data.cid + '" title="<?php _e('编辑'); ?>"><i class="i-edit"></i></a>'
-                + ' <a class="delete" href="###" title="<?php _e('删除'); ?>"><i class="i-delete"></i></a></div>')
+                + data.cid + '" title="<?php _e('Chỉnh sửa'); ?>"><i class="i-edit"></i></a>'
+                + ' <a class="delete" href="###" title="<?php _e('Xóa'); ?>"><i class="i-delete"></i></a></div>')
             .effect('highlight', 1000);
             
         attachInsertEvent(li);
@@ -120,8 +120,8 @@ $(document).ready(function() {
         }
     }
 
-    $('#tab-files').bind('init', function () {
-        var uploader = new plupload.Uploader({
+    var uploader = null, tabFilesEl = $('#tab-files').bind('init', function () {
+        uploader = new plupload.Uploader({
             browse_button   :   $('.upload-file').get(0),
             url             :   '<?php $security->index('/action/upload'
                 . (isset($fileParentContent) ? '?cid=' . $fileParentContent->cid : '')); ?>',
@@ -130,7 +130,7 @@ $(document).ready(function() {
             drop_element    :   $('.upload-area').get(0),
             filters         :   {
                 max_file_size       :   '<?php echo $phpMaxFilesize ?>',
-                mime_types          :   [{'title' : '<?php _e('允许上传的文件'); ?>', 'extensions' : '<?php echo implode(',', $options->allowedAttachmentTypes); ?>'}],
+                mime_types          :   [{'title' : '<?php _e('Các loại tập tin cho phép'); ?>', 'extensions' : '<?php echo implode(',', $options->allowedAttachmentTypes); ?>'}],
                 prevent_duplicates  :   true
             },
 
@@ -176,6 +176,23 @@ $(document).ready(function() {
         uploader.init();
     });
 
+    Typecho.uploadFile = function (file, name) {
+        if (!uploader) {
+            $('#tab-files-btn').parent().trigger('click');
+        }
+        
+        var timer = setInterval(function () {
+            if (!uploader) {
+                return;
+            }
+
+            clearInterval(timer);
+            timer = null;
+
+            uploader.addFile(file, name);
+        }, 50);
+    };
+
     function attachInsertEvent (el) {
         $('.insert', el).click(function () {
             var t = $(this), p = t.parents('li');
@@ -187,7 +204,7 @@ $(document).ready(function() {
     function attachDeleteEvent (el) {
         var file = $('a.insert', el).text();
         $('.delete', el).click(function () {
-            if (confirm('<?php _e('确认要删除文件 %s 吗?'); ?>'.replace('%s', file))) {
+            if (confirm('<?php _e('Bạn có chắc muốn xóa tập tin %s không?'); ?>'.replace('%s', file))) {
                 var cid = $(this).parents('li').data('cid');
                 $.post('<?php $security->index('/action/contents-attachment-edit'); ?>',
                     {'do' : 'delete', 'cid' : cid},

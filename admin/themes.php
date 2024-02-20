@@ -10,50 +10,66 @@ include 'menu.php';
         <div class="row typecho-page-main" role="main">
             <div class="col-mb-12">
                 <ul class="typecho-option-tabs fix-tabs clearfix">
-                    <li class="current"><a href="<?php $options->adminUrl('themes.php'); ?>"><?php _e('可以使用的外观'); ?></a></li>
-                    <?php if (!defined('__TYPECHO_THEME_WRITEABLE__') || __TYPECHO_THEME_WRITEABLE__): ?>
-                    <li><a href="<?php $options->adminUrl('theme-editor.php'); ?>"><?php _e('编辑当前外观'); ?></a></li>
+                    <li class="current"><a href="<?php $options->adminUrl('themes.php'); ?>"><?php _e('Các giao diện có thể sử dụng'); ?></a>
+                    </li>
+                    <?php if (\Widget\Themes\Files::isWriteable()): ?>
+                        <li><a href="<?php $options->adminUrl('theme-editor.php'); ?>"><?php _e('Chỉnh sửa giao diện hiện tại'); ?></a></li>
                     <?php endif; ?>
-                    <?php if (Widget_Themes_Config::isExists()): ?>
-                    <li><a href="<?php $options->adminUrl('options-theme.php'); ?>"><?php _e('设置外观'); ?></a></li>
+                    <?php if (\Widget\Themes\Config::isExists()): ?>
+                        <li><a href="<?php $options->adminUrl('options-theme.php'); ?>"><?php _e('Cài đặt giao diện'); ?></a></li>
                     <?php endif; ?>
                 </ul>
-                
+
                 <div class="typecho-table-wrap">
                     <table class="typecho-list-table typecho-theme-list">
                         <colgroup>
-                            <col width="35%" />
-                            <col />
+                            <col width="35%"/>
+                            <col/>
                         </colgroup>
-                        
+
                         <thead>
-                            <th><?php _e('截图'); ?></th>
-                            <th><?php _e('详情'); ?></th>
+                        <th><?php _e('Ảnh chụp màn hình'); ?></th>
+                        <th><?php _e('Chi tiết'); ?></th>
                         </thead>
 
                         <tbody>
-                            <?php Typecho_Widget::widget('Widget_Themes_List')->to($themes); ?>
-                            <?php while($themes->next()): ?>
-                            <tr id="theme-<?php $themes->name(); ?>" class="<?php if($themes->activated): ?>current<?php endif; ?>">
-                                <td valign="top"><img src="<?php $themes->screen(); ?>" alt="<?php $themes->name(); ?>" /></td>
+                        <?php if ($options->missingTheme): ?>
+                            <tr id="theme-<?php $options->missingTheme; ?>" class="current">
+                                <td colspan="2" class="warning">
+                                    <p><strong><?php _e('Phát hiện "%s" giao diện bạn đã sử dụng trước đây không tồn tại, bạn có thể tải lên lại giao diện này hoặc kích hoạt một giao diện khác.', $options->missingTheme); ?></strong></p>
+                                    <ul>
+                                        <li><?php _e('Sau khi tải lên giao diện này lại, làm mới trang hiện tại, thông báo này sẽ biến mất.'); ?></li>
+                                        <li><?php _e('Sau khi kích hoạt giao diện mới, dữ liệu cài đặt của giao diện hiện tại sẽ bị xóa bỏ.'); ?></li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                        <?php \Widget\Themes\Rows::alloc()->to($themes); ?>
+                        <?php while ($themes->next()): ?>
+                            <tr id="theme-<?php $themes->name(); ?>"
+                                class="<?php if ($themes->activated && !$options->missingTheme): ?>current<?php endif; ?>">
+                                <td valign="top"><img src="<?php $themes->screen(); ?>"
+                                                      alt="<?php $themes->name(); ?>"/></td>
                                 <td valign="top">
                                     <h3><?php '' != $themes->title ? $themes->title() : $themes->name(); ?></h3>
                                     <cite>
-                                        <?php if($themes->author): ?><?php _e('作者'); ?>: <?php if($themes->homepage): ?><a href="<?php $themes->homepage() ?>"><?php endif; ?><?php $themes->author(); ?><?php if($themes->homepage): ?></a><?php endif; ?> &nbsp;&nbsp;<?php endif; ?>
-                                        <?php if($themes->version): ?><?php _e('版本'); ?>: <?php $themes->version() ?><?php endif; ?>
+                                        <?php if ($themes->author): ?><?php _e('Tác giả'); ?>: <?php if ($themes->homepage): ?><a href="<?php $themes->homepage() ?>"><?php endif; ?><?php $themes->author(); ?><?php if ($themes->homepage): ?></a><?php endif; ?> &nbsp;&nbsp;<?php endif; ?>
+                                        <?php if ($themes->version): ?><?php _e('Phiên bản'); ?>: <?php $themes->version() ?><?php endif; ?>
                                     </cite>
                                     <p><?php echo nl2br($themes->description); ?></p>
-                                    <?php if($options->theme != $themes->name): ?>
+                                    <?php if ($options->theme != $themes->name || $options->missingTheme): ?>
                                         <p>
-                                            <?php if (!defined('__TYPECHO_THEME_WRITEABLE__') || __TYPECHO_THEME_WRITEABLE__): ?>
-                                            <a class="edit" href="<?php $options->adminUrl('theme-editor.php?theme=' . $themes->name); ?>"><?php _e('编辑'); ?></a> &nbsp;
+                                            <?php if (\Widget\Themes\Files::isWriteable()): ?>
+                                                <a class="edit"
+                                                   href="<?php $options->adminUrl('theme-editor.php?theme=' . $themes->name); ?>"><?php _e('Chỉnh sửa'); ?></a> &nbsp;
                                             <?php endif; ?>
-                                            <a class="activate" href="<?php $security->index('/action/themes-edit?change=' . $themes->name); ?>"><?php _e('启用'); ?></a>
+                                            <a class="activate"
+                                               href="<?php $security->index('/action/themes-edit?change=' . $themes->name); ?>"><?php _e('Kích hoạt'); ?></a>
                                         </p>
                                     <?php endif; ?>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                        <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>

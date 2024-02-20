@@ -1,39 +1,40 @@
 <?php if(!defined('__TYPECHO_ADMIN__')) exit; ?>
-<?php Typecho_Plugin::factory('admin/write-js.php')->write(); ?>
-<?php Typecho_Widget::widget('Widget_Metas_Tag_Cloud', 'sort=count&desc=1&limit=200')->to($tags); ?>
+<?php \Typecho\Plugin::factory('admin/write-js.php')->write(); ?>
+<?php \Widget\Metas\Tag\Cloud::alloc('sort=count&desc=1&limit=200')->to($tags); ?>
 
-<script src="<?php $options->adminStaticUrl('js', 'timepicker.js?v=' . $suffixVersion); ?>"></script>
-<script src="<?php $options->adminStaticUrl('js', 'tokeninput.js?v=' . $suffixVersion); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'timepicker.js'); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'tokeninput.js'); ?>"></script>
 <script>
 $(document).ready(function() {
     // 日期时间控件
     $('#date').mask('9999-99-99 99:99').datetimepicker({
-        currentText     :   '<?php _e('现在'); ?>',
-        prevText        :   '<?php _e('上一月'); ?>',
-        nextText        :   '<?php _e('下一月'); ?>',
-        monthNames      :   ['<?php _e('一月'); ?>', '<?php _e('二月'); ?>', '<?php _e('三月'); ?>', '<?php _e('四月'); ?>',
-            '<?php _e('五月'); ?>', '<?php _e('六月'); ?>', '<?php _e('七月'); ?>', '<?php _e('八月'); ?>',
-            '<?php _e('九月'); ?>', '<?php _e('十月'); ?>', '<?php _e('十一月'); ?>', '<?php _e('十二月'); ?>'],
-        dayNames        :   ['<?php _e('星期日'); ?>', '<?php _e('星期一'); ?>', '<?php _e('星期二'); ?>',
-            '<?php _e('星期三'); ?>', '<?php _e('星期四'); ?>', '<?php _e('星期五'); ?>', '<?php _e('星期六'); ?>'],
-        dayNamesShort   :   ['<?php _e('周日'); ?>', '<?php _e('周一'); ?>', '<?php _e('周二'); ?>', '<?php _e('周三'); ?>',
-            '<?php _e('周四'); ?>', '<?php _e('周五'); ?>', '<?php _e('周六'); ?>'],
-        dayNamesMin     :   ['<?php _e('日'); ?>', '<?php _e('一'); ?>', '<?php _e('二'); ?>', '<?php _e('三'); ?>',
-            '<?php _e('四'); ?>', '<?php _e('五'); ?>', '<?php _e('六'); ?>'],
-        closeText       :   '<?php _e('完成'); ?>',
-        timeOnlyTitle   :   '<?php _e('选择时间'); ?>',
-        timeText        :   '<?php _e('时间'); ?>',
-        hourText        :   '<?php _e('时'); ?>',
-        amNames         :   ['<?php _e('上午'); ?>', 'A'],
-        pmNames         :   ['<?php _e('下午'); ?>', 'P'],
-        minuteText      :   '<?php _e('分'); ?>',
-        secondText      :   '<?php _e('秒'); ?>',
+    currentText     :   '<?php _e('Bây giờ'); ?>',
+    prevText        :   '<?php _e('Tháng trước'); ?>',
+    nextText        :   '<?php _e('Tháng sau'); ?>',
+    monthNames      :   ['<?php _e('Tháng một'); ?>', '<?php _e('Tháng hai'); ?>', '<?php _e('Tháng ba'); ?>', '<?php _e('Tháng tư'); ?>',
+        '<?php _e('Tháng năm'); ?>', '<?php _e('Tháng sáu'); ?>', '<?php _e('Tháng bảy'); ?>', '<?php _e('Tháng tám'); ?>',
+        '<?php _e('Tháng chín'); ?>', '<?php _e('Tháng mười'); ?>', '<?php _e('Tháng mười một'); ?>', '<?php _e('Tháng mười hai'); ?>'],
+    dayNames        :   ['<?php _e('Chủ Nhật'); ?>', '<?php _e('Thứ Hai'); ?>', '<?php _e('Thứ Ba'); ?>',
+        '<?php _e('Thứ Tư'); ?>', '<?php _e('Thứ Năm'); ?>', '<?php _e('Thứ Sáu'); ?>', '<?php _e('Thứ Bảy'); ?>'],
+    dayNamesShort   :   ['<?php _e('CN'); ?>', '<?php _e('T2'); ?>', '<?php _e('T3'); ?>', '<?php _e('T4'); ?>',
+        '<?php _e('T5'); ?>', '<?php _e('T6'); ?>', '<?php _e('T7'); ?>'],
+    dayNamesMin     :   ['<?php _e('CN'); ?>', '<?php _e('T2'); ?>', '<?php _e('T3'); ?>', '<?php _e('T4'); ?>',
+        '<?php _e('T5'); ?>', '<?php _e('T6'); ?>', '<?php _e('T7'); ?>'],
+    closeText       :   '<?php _e('Hoàn thành'); ?>',
+    timeOnlyTitle   :   '<?php _e('Chọn thời gian'); ?>',
+    timeText        :   '<?php _e('Thời gian'); ?>',
+    hourText        :   '<?php _e('Giờ'); ?>',
+    amNames         :   ['<?php _e('Sáng'); ?>', 'A'],
+    pmNames         :   ['<?php _e('Chiều'); ?>', 'P'],
+    minuteText      :   '<?php _e('Phút'); ?>',
+    secondText      :   '<?php _e('Giây'); ?>',
 
-        dateFormat      :   'yy-mm-dd',
-        timezone        :   <?php $options->timezone(); ?> / 60,
-        hour            :   (new Date()).getHours(),
-        minute          :   (new Date()).getMinutes()
-    });
+    dateFormat      :   'yy-mm-dd',
+    timezone        :   <?php $options->timezone(); ?> / 60,
+    hour            :   (new Date()).getHours(),
+    minute          :   (new Date()).getMinutes()
+});
+
 
     // 聚焦
     $('#title').select();
@@ -67,15 +68,15 @@ $(document).ready(function() {
                 'tags'  =>  $tags->name
             );
         }
-        echo Json::encode($data);
+        echo json_encode($data);
         ?>, {
             propertyToSearch:   'tags',
             tokenValue      :   'tags',
             searchDelay     :   0,
             preventDuplicates   :   true,
             animateDropdown :   false,
-            hintText        :   '<?php _e('请输入标签名'); ?>',
-            noResultsText   :   '<?php _e('此标签不存在, 按回车创建'); ?>',
+            hintText        :   '<?php _e('Nhập tên thẻ'); ?>',
+noResultsText   :   '<?php _e('Thẻ này không tồn tại, nhấn Enter để tạo mới'); ?>',
             prePopulate     :   tagsPre,
 
             onResult        :   function (result, query, val) {
@@ -185,7 +186,7 @@ $(document).ready(function() {
             cid = o.cid;
             draftId = o.draftId;
             idInput.val(cid);
-            autoSave.text('<?php _e('已保存'); ?>' + ' (' + o.time + ')').effect('highlight', 1000);
+            autoSave.text('<?php _e('Đã lưu'); ?>' + ' (' + o.time + ')').effect('highlight', 1000);
             locked = false;
 
             btnSave.removeAttr('disabled');
@@ -199,7 +200,7 @@ $(document).ready(function() {
         changed = false;
         btnSave.attr('disabled', 'disabled');
         btnPreview.attr('disabled', 'disabled');
-        autoSave.text('<?php _e('正在保存'); ?>');
+        autoSave.text('<?php _e('Đang lưu'); ?>');
 
         if (typeof FormData !== 'undefined') {
             var data = new FormData(form.get(0));
@@ -255,7 +256,7 @@ $(document).ready(function() {
 
     $('#text').bind('input propertychange', function () {
         if (!locked) {
-            autoSave.text('<?php _e('尚未保存'); ?>' + (lastSaveTime ? ' (<?php _e('上次保存时间'); ?>: ' + lastSaveTime + ')' : ''));
+            autoSave.text('<?php _e('Chưa lưu'); ?>' + (lastSaveTime ? ' (<?php _e('Thời gian lưu lần cuối'); ?>: ' + lastSaveTime + ')' : ''));
         }
 
         if (!autoSaveOnce) {
@@ -268,7 +269,7 @@ $(document).ready(function() {
     // 自动检测离开页
     $(window).bind('beforeunload', function () {
         if (changed && !submitted) {
-            return '<?php _e('内容已经改变尚未保存, 您确认要离开此页面吗?'); ?>';
+            return '<?php _e('Nội dung đã được thay đổi nhưng chưa được lưu, bạn có chắc chắn muốn rời khỏi trang này không?'); ?>';
         }
     });
 
@@ -281,7 +282,7 @@ $(document).ready(function() {
 
         var frame = $('<iframe frameborder="0" class="preview-frame preview-loading"></iframe>')
             .attr('src', './preview.php?cid=' + cid)
-            .attr('sandbox', 'allow-scripts')
+            .attr('sandbox', 'allow-same-origin allow-scripts')
             .appendTo(document.body);
 
         frame.load(function () {
@@ -316,7 +317,7 @@ $(document).ready(function() {
         if (changed) {
             locked = true;
 
-            if (confirm('<?php _e('修改后的内容需要保存后才能预览, 是否保存?'); ?>')) {
+            if (confirm('<?php _e('Nội dung sau khi chỉnh sửa cần được lưu trước khi xem trước. Bạn có muốn lưu không?'); ?>')) {
                 saveData(function (o) {
                     previewData(o.draftId);
                 });
@@ -375,7 +376,7 @@ $(document).ready(function() {
     
     // 草稿删除确认
     $('.edit-draft-notice a').click(function () {
-        if (confirm('<?php _e('您确认要删除这份草稿吗?'); ?>')) {
+        if (confirm('<?php _e('Bạn có chắc chắn muốn xóa bản nháp này không?'); ?>')) {
             window.location.href = $(this).attr('href');
         }
 

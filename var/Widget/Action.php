@@ -73,6 +73,6 @@ class Action extends Widget
             }
         }
 
-        throw new Widget\Exception(_t('请求的地址不存在'), 404);
+        throw new Widget\Exception(_t('Địa chỉ được yêu cầu không tồn tại'), 404);
     }
 }

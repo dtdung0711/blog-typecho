@@ -1,88 +1,107 @@
 <?php
-if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+
+namespace Widget;
+
+use Typecho\Common;
+use Typecho\Cookie;
+use Typecho\Db\Exception;
+use Typecho\Validate;
+use Utils\PasswordHash;
+use Widget\Base\Users;
+
+if (!defined('__TYPECHO_ROOT_DIR__')) {
+    exit;
+}
+
 /**
- * 注册组件
+ * Component đăng ký
  *
  * @author qining
  * @category typecho
  * @package Widget
  */
-class Widget_Register extends Widget_Abstract_Users implements Widget_Interface_Do
+class Register extends Users implements ActionInterface
 {
     /**
-     * 初始化函数
+     * Hàm khởi tạo
      *
-     * @access public
-     * @return void
+     * @throws Exception
      */
     public function action()
     {
-        // protect
+        // Bảo vệ
         $this->security->protect();
 
-        /** 如果已经登录 */
+        /** Nếu đã đăng nhập hoặc không cho phép đăng ký */
         if ($this->user->hasLogin() || !$this->options->allowRegister) {
-            /** 直接返回 */
+            /** Chuyển hướng trực tiếp */
             $this->response->redirect($this->options->index);
         }
 
-        /** 初始化验证类 */
-        $validator = new Typecho_Validate();
-        $validator->addRule('name', 'required', _t('必须填写用户名称'));
-        $validator->addRule('name', 'minLength', _t('用户名至少包含2个字符'), 2);
-        $validator->addRule('name', 'maxLength', _t('用户名最多包含32个字符'), 32);
-        $validator->addRule('name', 'xssCheck', _t('请不要在用户名中使用特殊字符'));
-        $validator->addRule('name', array($this, 'nameExists'), _t('用户名已经存在'));
-        $validator->addRule('mail', 'required', _t('必须填写电子邮箱'));
-        $validator->addRule('mail', array($this, 'mailExists'), _t('电子邮箱地址已经存在'));
-        $validator->addRule('mail', 'email', _t('电子邮箱格式错误'));
-        $validator->addRule('mail', 'maxLength', _t('电子邮箱最多包含64个字符'), 64);
+        /** Khởi tạo đối tượng xác nhận */
+        $validator = new Validate();
+        $validator->addRule('name', 'required', _t('Phải nhập tên người dùng'));
+        $validator->addRule('name', 'minLength', _t('Tên người dùng phải chứa ít nhất 2 ký tự'), 2);
+        $validator->addRule('name', 'maxLength', _t('Tên người dùng chỉ có thể chứa tối đa 32 ký tự'), 32);
+        $validator->addRule('name', 'xssCheck', _t('Vui lòng không sử dụng ký tự đặc biệt trong tên người dùng'));
+        $validator->addRule('name', [$this, 'nameExists'], _t('Tên người dùng đã tồn tại'));
+        $validator->addRule('mail', 'required', _t('Phải nhập địa chỉ email'));
+        $validator->addRule('mail', [$this, 'mailExists'], _t('Địa chỉ email đã tồn tại'));
+        $validator->addRule('mail', 'email', _t('Địa chỉ email không hợp lệ'));
+        $validator->addRule('mail', 'maxLength', _t('Địa chỉ email chỉ có thể chứa tối đa 64 ký tự'), 64);
 
-        /** 如果请求中有password */
+        /** Nếu yêu cầu chứa mật khẩu */
         if (array_key_exists('password', $_REQUEST)) {
-            $validator->addRule('password', 'required', _t('必须填写密码'));
-            $validator->addRule('password', 'minLength', _t('为了保证账户安全, 请输入至少六位的密码'), 6);
-            $validator->addRule('password', 'maxLength', _t('为了便于记忆, 密码长度请不要超过十八位'), 18);
-            $validator->addRule('confirm', 'confirm', _t('两次输入的密码不一致'), 'password');
+            $validator->addRule('password', 'required', _t('Phải nhập mật khẩu'));
+            $validator->addRule('password', 'minLength', _t('Để đảm bảo an toàn cho tài khoản, mật khẩu phải chứa ít nhất 6 ký tự'), 6);
+            $validator->addRule('password', 'maxLength', _t('Để dễ nhớ, mật khẩu không được quá 18 ký tự'), 18);
+            $validator->addRule('confirm', 'confirm', _t('Hai lần nhập mật khẩu không khớp'), 'password');
         }
 
-        /** 截获验证异常 */
+        /** Nếu có lỗi trong quá trình xác nhận */
         if ($error = $validator->run($this->request->from('name', 'password', 'mail', 'confirm'))) {
-            Typecho_Cookie::set('__typecho_remember_name', $this->request->name);
-            Typecho_Cookie::set('__typecho_remember_mail', $this->request->mail);
+            Cookie::set('__typecho_remember_name', $this->request->name);
+            Cookie::set('__typecho_remember_mail', $this->request->mail);
 
-            /** 设置提示信息 */
-            $this->widget('Widget_Notice')->set($error);
+            /** Thiết lập thông báo */
+            Notice::alloc()->set($error);
             $this->response->goBack();
         }
 
         $hasher = new PasswordHash(8, true);
-        $generatedPassword = Typecho_Common::randString(7);
+        $generatedPassword = Common::randString(7);
 
-        $dataStruct = array(
-            'name'      =>  $this->request->name,
-            'mail'      =>  $this->request->mail,
-            'screenName'=>  $this->request->name,
-            'password'  =>  $hasher->HashPassword($generatedPassword),
-            'created'   =>  $this->options->time,
-            'group'     =>  'subscriber'
-        );
+        $dataStruct = [
+            'name' => $this->request->name,
+            'mail' => $this->request->mail,
+            'screenName' => $this->request->name,
+            'password' => $hasher->hashPassword($generatedPassword),
+            'created' => $this->options->time,
+            'group' => 'subscriber'
+        ];
 
-        $dataStruct = $this->pluginHandle()->register($dataStruct);
+        $dataStruct = self::pluginHandle()->register($dataStruct);
 
         $insertId = $this->insert($dataStruct);
         $this->db->fetchRow($this->select()->where('uid = ?', $insertId)
-        ->limit(1), array($this, 'push'));
+            ->limit(1), [$this, 'push']);
 
-        $this->pluginHandle()->finishRegister($this);
+        self::pluginHandle()->finishRegister($this);
 
         $this->user->login($this->request->name, $generatedPassword);
 
-        Typecho_Cookie::delete('__typecho_first_run');
-        Typecho_Cookie::delete('__typecho_remember_name');
-        Typecho_Cookie::delete('__typecho_remember_mail');
+        Cookie::delete('__typecho_first_run');
+        Cookie::delete('__typecho_remember_name');
+        Cookie::delete('__typecho_remember_mail');
 
-        $this->widget('Widget_Notice')->set(_t('用户 <strong>%s</strong> 已经成功注册, 密码为 <strong>%s</strong>', $this->screenName, $generatedPassword), 'success');
+        Notice::alloc()->set(
+            _t(
+                'Người dùng <strong>%s</strong> đã đăng ký thành công, mật khẩu là <strong>%s</strong>',
+                $this->screenName,
+                $generatedPassword
+            ),
+            'success'
+        );
         $this->response->redirect($this->options->adminUrl);
     }
 }

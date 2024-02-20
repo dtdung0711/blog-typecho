@@ -1,7 +1,9 @@
 <?php if(!defined('__TYPECHO_ADMIN__')) exit; ?>
 <?php $content = !empty($post) ? $post : $page; if ($options->markdown): ?>
-<script src="<?php $options->adminStaticUrl('js', 'hyperdown.js?v=' . $suffixVersion); ?>"></script>
-<script src="<?php $options->adminStaticUrl('js', 'pagedown.js?v=' . $suffixVersion); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'hyperdown.js'); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'pagedown.js'); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'paste.js'); ?>"></script>
+<script src="<?php $options->adminStaticUrl('js', 'purify.js'); ?>"></script>
 <script>
 $(document).ready(function () {
     var textarea = $('#text'),
@@ -12,50 +14,51 @@ $(document).ready(function () {
     var options = {}, isMarkdown = <?php echo intval($content->isMarkdown || !$content->have()); ?>;
 
     options.strings = {
-        bold: '<?php _e('加粗'); ?> <strong> Ctrl+B',
-        boldexample: '<?php _e('加粗文字'); ?>',
-            
-        italic: '<?php _e('斜体'); ?> <em> Ctrl+I',
-        italicexample: '<?php _e('斜体文字'); ?>',
+    bold: '<?php _e('In đậm'); ?> <strong> Ctrl+B',
+    boldexample: '<?php _e('Nội dung in đậm'); ?>',
+        
+    italic: '<?php _e('In nghiêng'); ?> <em> Ctrl+I',
+    italicexample: '<?php _e('Nội dung in nghiêng'); ?>',
 
-        link: '<?php _e('链接'); ?> <a> Ctrl+L',
-        linkdescription: '<?php _e('请输入链接描述'); ?>',
+    link: '<?php _e('Liên kết'); ?> <a> Ctrl+L',
+    linkdescription: '<?php _e('Vui lòng nhập mô tả liên kết'); ?>',
 
-        quote:  '<?php _e('引用'); ?> <blockquote> Ctrl+Q',
-        quoteexample: '<?php _e('引用文字'); ?>',
+    quote:  '<?php _e('Trích dẫn'); ?> <blockquote> Ctrl+Q',
+    quoteexample: '<?php _e('Nội dung trích dẫn'); ?>',
 
-        code: '<?php _e('代码'); ?> <pre><code> Ctrl+K',
-        codeexample: '<?php _e('请输入代码'); ?>',
+    code: '<?php _e('Mã code'); ?> <pre><code> Ctrl+K',
+    codeexample: '<?php _e('Vui lòng nhập mã code'); ?>',
 
-        image: '<?php _e('图片'); ?> <img> Ctrl+G',
-        imagedescription: '<?php _e('请输入图片描述'); ?>',
+    image: '<?php _e('Hình ảnh'); ?> <img> Ctrl+G',
+    imagedescription: '<?php _e('Vui lòng nhập mô tả hình ảnh'); ?>',
 
-        olist: '<?php _e('数字列表'); ?> <ol> Ctrl+O',
-        ulist: '<?php _e('普通列表'); ?> <ul> Ctrl+U',
-        litem: '<?php _e('列表项目'); ?>',
+    olist: '<?php _e('Danh sách có số'); ?> <ol> Ctrl+O',
+    ulist: '<?php _e('Danh sách không có số'); ?> <ul> Ctrl+U',
+    litem: '<?php _e('Mục danh sách'); ?>',
 
-        heading: '<?php _e('标题'); ?> <h1>/<h2> Ctrl+H',
-        headingexample: '<?php _e('标题文字'); ?>',
+    heading: '<?php _e('Tiêu đề'); ?> <h1>/<h2> Ctrl+H',
+    headingexample: '<?php _e('Nội dung tiêu đề'); ?>',
 
-        hr: '<?php _e('分割线'); ?> <hr> Ctrl+R',
-        more: '<?php _e('摘要分割线'); ?> <!--more--> Ctrl+M',
+    hr: '<?php _e('Đường kẻ ngang'); ?> <hr> Ctrl+R',
+    more: '<?php _e('Đường kẻ ngang cho phần mở rộng'); ?> <!--more--> Ctrl+M',
 
-        undo: '<?php _e('撤销'); ?> - Ctrl+Z',
-        redo: '<?php _e('重做'); ?> - Ctrl+Y',
-        redomac: '<?php _e('重做'); ?> - Ctrl+Shift+Z',
+    undo: '<?php _e('Hoàn tác'); ?> - Ctrl+Z',
+    redo: '<?php _e('Làm lại'); ?> - Ctrl+Y',
+    redomac: '<?php _e('Làm lại'); ?> - Ctrl+Shift+Z',
 
-        fullscreen: '<?php _e('全屏'); ?> - Ctrl+J',
-        exitFullscreen: '<?php _e('退出全屏'); ?> - Ctrl+E',
-        fullscreenUnsupport: '<?php _e('此浏览器不支持全屏操作'); ?>',
+    fullscreen: '<?php _e('Chế độ toàn màn hình'); ?> - Ctrl+J',
+    exitFullscreen: '<?php _e('Thoát chế độ toàn màn hình'); ?> - Ctrl+E',
+    fullscreenUnsupport: '<?php _e('Trình duyệt này không hỗ trợ chế độ toàn màn hình'); ?>',
 
-        imagedialog: '<p><b><?php _e('插入图片'); ?></b></p><p><?php _e('请在下方的输入框内输入要插入的远程图片地址'); ?></p><p><?php _e('您也可以使用附件功能插入上传的本地图片'); ?></p>',
-        linkdialog: '<p><b><?php _e('插入链接'); ?></b></p><p><?php _e('请在下方的输入框内输入要插入的链接地址'); ?></p>',
+    imagedialog: '<p><b><?php _e('Chèn hình ảnh'); ?></b></p><p><?php _e('Vui lòng nhập địa chỉ hình ảnh từ xa bạn muốn chèn vào ô nhập dưới đây'); ?></p><p><?php _e('Bạn cũng có thể sử dụng tính năng đính kèm để chèn hình ảnh từ máy tính của bạn'); ?></p>',
+    linkdialog: '<p><b><?php _e('Chèn liên kết'); ?></b></p><p><?php _e('Vui lòng nhập địa chỉ liên kết bạn muốn chèn vào ô nhập dưới đây'); ?></p>',
 
-        ok: '<?php _e('确定'); ?>',
-        cancel: '<?php _e('取消'); ?>',
+    ok: '<?php _e('Đồng ý'); ?>',
+    cancel: '<?php _e('Hủy bỏ'); ?>',
 
-        help: '<?php _e('Markdown语法帮助'); ?>'
-    };
+    help: '<?php _e('Trợ giúp về cú pháp Markdown'); ?>'
+};
+
 
     var converter = new HyperDown(),
         editor = new Markdown.Editor(converter, '', options);
@@ -84,11 +87,11 @@ $(document).ready(function () {
                 src = src.substring(0, src.length - 1);
             }
 
-            return '<div style="border: 1px solid #ccc; height: 40px; overflow: hidden; line-height: 40px; text-align: center; font-size: 12px; color: #777"><strong>'
+            return '<div class="embed"><strong>'
                 + tag + '</strong> : ' + $.trim(src) + '</div>';
         });
 
-        return html;
+        return DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
     });
 
     editor.hooks.chain('onPreviewRefresh', function () {
@@ -97,7 +100,7 @@ $(document).ready(function () {
         if (count == 0) {
             reloadScroll(true);
         } else {
-            images.load(function () {
+            images.bind('load error', function () {
                 count --;
 
                 if (count == 0) {
@@ -107,7 +110,7 @@ $(document).ready(function () {
         }
     });
 
-    <?php Typecho_Plugin::factory('admin/editor-js.php')->markdownEditor($content); ?>
+    <?php \Typecho\Plugin::factory('admin/editor-js.php')->markdownEditor($content); ?>
 
     var th = textarea.height(), ph = preview.height(),
         uploadBtn = $('<button type="button" id="btn-fullscreen-upload" class="btn btn-link">'
@@ -180,7 +183,7 @@ $(document).ready(function () {
         };
 
         // 编辑预览切换
-        var edittab = $('.editor').prepend('<div class="wmd-edittab"><a href="#wmd-editarea" class="active"><?php _e('撰写'); ?></a><a href="#wmd-preview"><?php _e('预览'); ?></a></div>'),
+        var edittab = $('.editor').prepend('<div class="wmd-edittab"><a href="#wmd-editarea" class="active"><?php _e('Viết'); ?></a><a href="#wmd-preview"><?php _e('Xem trước'); ?></a></div>');
             editarea = $(textarea.parent()).attr("id", "wmd-editarea");
 
         $(".wmd-edittab a").click(function() {
@@ -203,14 +206,25 @@ $(document).ready(function () {
 
             return false;
         });
+
+        // 剪贴板复制图片
+        textarea.pastableTextarea().on('pasteImage', function (e, data) {
+            var name = data.name ? data.name.replace(/[\(\)\[\]\*#!]/g, '') : (new Date()).toISOString().replace(/\..+$/, '');
+            if (!name.match(/\.[a-z0-9]{2,}$/i)) {
+                var ext = data.blob.type.split('/').pop();
+                name += '.' + ext;
+            }
+
+            Typecho.uploadFile(new File([data.blob], name), name);
+        });
     }
 
     if (isMarkdown) {
         initMarkdown();
     } else {
-        var notice = $('<div class="message notice"><?php _e('这篇文章不是由Markdown语法创建的, 继续使用Markdown编辑它吗?'); ?> '
-            + '<button class="btn btn-xs primary yes"><?php _e('是'); ?></button> ' 
-            + '<button class="btn btn-xs no"><?php _e('否'); ?></button></div>')
+        var notice = $('<div class="message notice"><?php _e('Bài viết này không được tạo bằng cú pháp Markdown, bạn có muốn tiếp tục sử dụng Markdown để chỉnh sửa không?'); ?> '
+            + '<button class="btn btn-xs primary yes"><?php _e('Có'); ?></button> ' 
+            + '<button class="btn btn-xs no"><?php _e('Không'); ?></button></div>')
             .hide().insertBefore(textarea).slideDown();
 
         $('.yes', notice).click(function () {
